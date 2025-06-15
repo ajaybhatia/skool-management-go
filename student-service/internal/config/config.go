@@ -29,8 +29,8 @@ func Load() *Config {
 }
 
 func (c *Config) GetDSN() string {
-	return "host=" + c.DBHost + " port=" + c.DBPort + " user=" + c.DBUser + 
-		   " password=" + c.DBPassword + " dbname=" + c.DBName + " sslmode=disable"
+	return "host=" + c.DBHost + " port=" + c.DBPort + " user=" + c.DBUser +
+		" password=" + c.DBPassword + " dbname=" + c.DBName + " sslmode=disable"
 }
 
 func getEnv(key, defaultValue string) string {

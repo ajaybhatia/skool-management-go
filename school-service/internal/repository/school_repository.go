@@ -24,9 +24,9 @@ func (r *SchoolRepository) Create(school *models.CreateSchoolRequest) (*models.S
 
 	now := time.Now()
 	var result models.School
-	err := r.db.QueryRow(query, school.RegistrationNumber, school.Name, school.Address, 
+	err := r.db.QueryRow(query, school.RegistrationNumber, school.Name, school.Address,
 		school.Phone, school.Email, now, now).Scan(
-		&result.ID, &result.RegistrationNumber, &result.Name, &result.Address, 
+		&result.ID, &result.RegistrationNumber, &result.Name, &result.Address,
 		&result.Phone, &result.Email, &result.CreatedAt, &result.UpdatedAt,
 	)
 
@@ -54,7 +54,7 @@ func (r *SchoolRepository) GetAll() ([]models.School, error) {
 	for rows.Next() {
 		var school models.School
 		err := rows.Scan(
-			&school.ID, &school.RegistrationNumber, &school.Name, &school.Address, 
+			&school.ID, &school.RegistrationNumber, &school.Name, &school.Address,
 			&school.Phone, &school.Email, &school.CreatedAt, &school.UpdatedAt,
 		)
 		if err != nil {
@@ -75,7 +75,7 @@ func (r *SchoolRepository) GetByID(id int) (*models.School, error) {
 
 	var school models.School
 	err := r.db.QueryRow(query, id).Scan(
-		&school.ID, &school.RegistrationNumber, &school.Name, &school.Address, 
+		&school.ID, &school.RegistrationNumber, &school.Name, &school.Address,
 		&school.Phone, &school.Email, &school.CreatedAt, &school.UpdatedAt,
 	)
 
@@ -95,9 +95,9 @@ func (r *SchoolRepository) Update(id int, school *models.UpdateSchoolRequest) (*
 	`
 
 	var result models.School
-	err := r.db.QueryRow(query, school.RegistrationNumber, school.Name, school.Address, 
+	err := r.db.QueryRow(query, school.RegistrationNumber, school.Name, school.Address,
 		school.Phone, school.Email, time.Now(), id).Scan(
-		&result.ID, &result.RegistrationNumber, &result.Name, &result.Address, 
+		&result.ID, &result.RegistrationNumber, &result.Name, &result.Address,
 		&result.Phone, &result.Email, &result.CreatedAt, &result.UpdatedAt,
 	)
 

@@ -24,12 +24,12 @@ func NewUserRepository(db *mongo.Database) *UserRepository {
 func (r *UserRepository) Create(user *models.User) error {
 	user.CreatedAt = time.Now()
 	user.UpdatedAt = time.Now()
-	
+
 	result, err := r.collection.InsertOne(context.Background(), user)
 	if err != nil {
 		return err
 	}
-	
+
 	user.ID = result.InsertedID.(primitive.ObjectID)
 	return nil
 }

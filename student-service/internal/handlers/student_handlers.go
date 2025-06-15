@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
+	"skool-management/shared"
 	"skool-management/student-service/internal/models"
 	"skool-management/student-service/internal/service"
-	"skool-management/shared"
 )
 
 type StudentHandlers struct {

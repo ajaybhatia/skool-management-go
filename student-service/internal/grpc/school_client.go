@@ -13,18 +13,22 @@ type ValidateSchoolRequest struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 }
 
-func (m *ValidateSchoolRequest) Reset()         { *m = ValidateSchoolRequest{} }
-func (m *ValidateSchoolRequest) String() string { return fmt.Sprintf("ValidateSchoolRequest{Id: %s}", m.Id) }
-func (*ValidateSchoolRequest) ProtoMessage()    {}
+func (m *ValidateSchoolRequest) Reset() { *m = ValidateSchoolRequest{} }
+func (m *ValidateSchoolRequest) String() string {
+	return fmt.Sprintf("ValidateSchoolRequest{Id: %s}", m.Id)
+}
+func (*ValidateSchoolRequest) ProtoMessage() {}
 
 type ValidateSchoolResponse struct {
 	Exists bool   `protobuf:"varint,1,opt,name=exists,proto3" json:"exists,omitempty"`
 	Name   string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 }
 
-func (m *ValidateSchoolResponse) Reset()         { *m = ValidateSchoolResponse{} }
-func (m *ValidateSchoolResponse) String() string { return fmt.Sprintf("ValidateSchoolResponse{Exists: %t, Name: %s}", m.Exists, m.Name) }
-func (*ValidateSchoolResponse) ProtoMessage()    {}
+func (m *ValidateSchoolResponse) Reset() { *m = ValidateSchoolResponse{} }
+func (m *ValidateSchoolResponse) String() string {
+	return fmt.Sprintf("ValidateSchoolResponse{Exists: %t, Name: %s}", m.Exists, m.Name)
+}
+func (*ValidateSchoolResponse) ProtoMessage() {}
 
 type GetSchoolRequest struct {
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -39,9 +43,11 @@ type GetSchoolResponse struct {
 	Found  bool         `protobuf:"varint,2,opt,name=found,proto3" json:"found,omitempty"`
 }
 
-func (m *GetSchoolResponse) Reset()         { *m = GetSchoolResponse{} }
-func (m *GetSchoolResponse) String() string { return fmt.Sprintf("GetSchoolResponse{Found: %t}", m.Found) }
-func (*GetSchoolResponse) ProtoMessage()    {}
+func (m *GetSchoolResponse) Reset() { *m = GetSchoolResponse{} }
+func (m *GetSchoolResponse) String() string {
+	return fmt.Sprintf("GetSchoolResponse{Found: %t}", m.Found)
+}
+func (*GetSchoolResponse) ProtoMessage() {}
 
 type ProtoSchool struct {
 	Id                 string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -60,34 +66,40 @@ func (*ProtoSchool) ProtoMessage()    {}
 
 // Implement proto.Message interface methods
 func (m *ValidateSchoolRequest) XXX_Unmarshal(b []byte) error { return nil }
-func (m *ValidateSchoolRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) { return nil, nil }
+func (m *ValidateSchoolRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return nil, nil
+}
 func (m *ValidateSchoolRequest) XXX_Merge(src proto.Message) {}
-func (m *ValidateSchoolRequest) XXX_Size() int { return 0 }
-func (m *ValidateSchoolRequest) XXX_DiscardUnknown() {}
+func (m *ValidateSchoolRequest) XXX_Size() int               { return 0 }
+func (m *ValidateSchoolRequest) XXX_DiscardUnknown()         {}
 
 func (m *ValidateSchoolResponse) XXX_Unmarshal(b []byte) error { return nil }
-func (m *ValidateSchoolResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) { return nil, nil }
+func (m *ValidateSchoolResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return nil, nil
+}
 func (m *ValidateSchoolResponse) XXX_Merge(src proto.Message) {}
-func (m *ValidateSchoolResponse) XXX_Size() int { return 0 }
-func (m *ValidateSchoolResponse) XXX_DiscardUnknown() {}
+func (m *ValidateSchoolResponse) XXX_Size() int               { return 0 }
+func (m *ValidateSchoolResponse) XXX_DiscardUnknown()         {}
 
-func (m *GetSchoolRequest) XXX_Unmarshal(b []byte) error { return nil }
+func (m *GetSchoolRequest) XXX_Unmarshal(b []byte) error                             { return nil }
 func (m *GetSchoolRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) { return nil, nil }
-func (m *GetSchoolRequest) XXX_Merge(src proto.Message) {}
-func (m *GetSchoolRequest) XXX_Size() int { return 0 }
-func (m *GetSchoolRequest) XXX_DiscardUnknown() {}
+func (m *GetSchoolRequest) XXX_Merge(src proto.Message)                              {}
+func (m *GetSchoolRequest) XXX_Size() int                                            { return 0 }
+func (m *GetSchoolRequest) XXX_DiscardUnknown()                                      {}
 
 func (m *GetSchoolResponse) XXX_Unmarshal(b []byte) error { return nil }
-func (m *GetSchoolResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) { return nil, nil }
+func (m *GetSchoolResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return nil, nil
+}
 func (m *GetSchoolResponse) XXX_Merge(src proto.Message) {}
-func (m *GetSchoolResponse) XXX_Size() int { return 0 }
-func (m *GetSchoolResponse) XXX_DiscardUnknown() {}
+func (m *GetSchoolResponse) XXX_Size() int               { return 0 }
+func (m *GetSchoolResponse) XXX_DiscardUnknown()         {}
 
-func (m *ProtoSchool) XXX_Unmarshal(b []byte) error { return nil }
+func (m *ProtoSchool) XXX_Unmarshal(b []byte) error                             { return nil }
 func (m *ProtoSchool) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) { return nil, nil }
-func (m *ProtoSchool) XXX_Merge(src proto.Message) {}
-func (m *ProtoSchool) XXX_Size() int { return 0 }
-func (m *ProtoSchool) XXX_DiscardUnknown() {}
+func (m *ProtoSchool) XXX_Merge(src proto.Message)                              {}
+func (m *ProtoSchool) XXX_Size() int                                            { return 0 }
+func (m *ProtoSchool) XXX_DiscardUnknown()                                      {}
 
 // School Service gRPC client interface
 type SchoolServiceClient interface {

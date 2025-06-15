@@ -24,11 +24,11 @@ func (r *StudentRepository) Create(student *models.CreateStudentRequest) (*model
 
 	now := time.Now()
 	var result models.Student
-	err := r.db.QueryRow(query, student.RollNumber, student.FirstName, student.LastName, 
-		student.Email, student.Phone, student.DateOfBirth, student.Address, student.SchoolID, 
+	err := r.db.QueryRow(query, student.RollNumber, student.FirstName, student.LastName,
+		student.Email, student.Phone, student.DateOfBirth, student.Address, student.SchoolID,
 		student.EnrollmentDate, student.Status, now, now).Scan(
-		&result.ID, &result.RollNumber, &result.FirstName, &result.LastName, &result.Email, 
-		&result.Phone, &result.DateOfBirth, &result.Address, &result.SchoolID, 
+		&result.ID, &result.RollNumber, &result.FirstName, &result.LastName, &result.Email,
+		&result.Phone, &result.DateOfBirth, &result.Address, &result.SchoolID,
 		&result.EnrollmentDate, &result.Status, &result.CreatedAt, &result.UpdatedAt,
 	)
 
@@ -56,8 +56,8 @@ func (r *StudentRepository) GetAll() ([]models.Student, error) {
 	for rows.Next() {
 		var student models.Student
 		err := rows.Scan(
-			&student.ID, &student.RollNumber, &student.FirstName, &student.LastName, &student.Email, 
-			&student.Phone, &student.DateOfBirth, &student.Address, &student.SchoolID, 
+			&student.ID, &student.RollNumber, &student.FirstName, &student.LastName, &student.Email,
+			&student.Phone, &student.DateOfBirth, &student.Address, &student.SchoolID,
 			&student.EnrollmentDate, &student.Status, &student.CreatedAt, &student.UpdatedAt,
 		)
 		if err != nil {
@@ -78,8 +78,8 @@ func (r *StudentRepository) GetByID(id int) (*models.Student, error) {
 
 	var student models.Student
 	err := r.db.QueryRow(query, id).Scan(
-		&student.ID, &student.RollNumber, &student.FirstName, &student.LastName, &student.Email, 
-		&student.Phone, &student.DateOfBirth, &student.Address, &student.SchoolID, 
+		&student.ID, &student.RollNumber, &student.FirstName, &student.LastName, &student.Email,
+		&student.Phone, &student.DateOfBirth, &student.Address, &student.SchoolID,
 		&student.EnrollmentDate, &student.Status, &student.CreatedAt, &student.UpdatedAt,
 	)
 
@@ -108,8 +108,8 @@ func (r *StudentRepository) GetBySchoolID(schoolID int) ([]models.Student, error
 	for rows.Next() {
 		var student models.Student
 		err := rows.Scan(
-			&student.ID, &student.RollNumber, &student.FirstName, &student.LastName, &student.Email, 
-			&student.Phone, &student.DateOfBirth, &student.Address, &student.SchoolID, 
+			&student.ID, &student.RollNumber, &student.FirstName, &student.LastName, &student.Email,
+			&student.Phone, &student.DateOfBirth, &student.Address, &student.SchoolID,
 			&student.EnrollmentDate, &student.Status, &student.CreatedAt, &student.UpdatedAt,
 		)
 		if err != nil {
@@ -131,11 +131,11 @@ func (r *StudentRepository) Update(id int, student *models.UpdateStudentRequest)
 	`
 
 	var result models.Student
-	err := r.db.QueryRow(query, student.RollNumber, student.FirstName, student.LastName, 
-		student.Email, student.Phone, student.DateOfBirth, student.Address, student.SchoolID, 
+	err := r.db.QueryRow(query, student.RollNumber, student.FirstName, student.LastName,
+		student.Email, student.Phone, student.DateOfBirth, student.Address, student.SchoolID,
 		student.EnrollmentDate, student.Status, time.Now(), id).Scan(
-		&result.ID, &result.RollNumber, &result.FirstName, &result.LastName, &result.Email, 
-		&result.Phone, &result.DateOfBirth, &result.Address, &result.SchoolID, 
+		&result.ID, &result.RollNumber, &result.FirstName, &result.LastName, &result.Email,
+		&result.Phone, &result.DateOfBirth, &result.Address, &result.SchoolID,
 		&result.EnrollmentDate, &result.Status, &result.CreatedAt, &result.UpdatedAt,
 	)
 

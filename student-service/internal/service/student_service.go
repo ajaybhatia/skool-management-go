@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"skool-management/shared"
 	"skool-management/student-service/internal/models"
 	"skool-management/student-service/internal/repository"
-	"skool-management/shared"
 
 	grpcLib "google.golang.org/grpc"
 )

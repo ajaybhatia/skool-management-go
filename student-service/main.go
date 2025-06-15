@@ -8,12 +8,12 @@ import (
 	"net/http"
 	"strings"
 
+	"skool-management/shared"
 	"skool-management/student-service/internal/config"
 	"skool-management/student-service/internal/handlers"
 	"skool-management/student-service/internal/middleware"
 	"skool-management/student-service/internal/repository"
 	"skool-management/student-service/internal/service"
-	"skool-management/shared"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

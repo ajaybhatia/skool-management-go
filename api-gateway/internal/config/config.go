@@ -11,9 +11,9 @@ type Config struct {
 
 func Load() *Config {
 	return &Config{
-		Port: getEnv("PORT", "8080"),
-		AuthServiceURL: getEnv("AUTH_SERVICE_URL", "http://localhost:8081"),
-		SchoolServiceURL: getEnv("SCHOOL_SERVICE_URL", "http://localhost:8082"),
+		Port:              getEnv("PORT", "8080"),
+		AuthServiceURL:    getEnv("AUTH_SERVICE_URL", "http://localhost:8081"),
+		SchoolServiceURL:  getEnv("SCHOOL_SERVICE_URL", "http://localhost:8082"),
 		StudentServiceURL: getEnv("STUDENT_SERVICE_URL", "http://localhost:8083"),
 	}
 }
