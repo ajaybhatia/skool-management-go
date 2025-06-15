@@ -69,6 +69,8 @@ clean:
 	docker compose down -v
 	docker system prune -f
 	docker volume prune -f
+	docker builder prune -f
+	@echo "All containers, volumes, and unused images have been removed."
 
 # Clean all database records (keep structure)
 clean-db:
