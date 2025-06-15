@@ -1,0 +1,44 @@
+{
+  "signup": {
+    "url": "http://localhost:8080/auth/signup",
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "email": "john.doe@example.com",
+      "password": "securepassword123",
+      "first_name": "John",
+      "last_name": "Doe",
+      "role": "user"
+    }
+  },
+  "login": {
+    "url": "http://localhost:8080/auth/login",
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "email": "john.doe@example.com",
+      "password": "securepassword123"
+    }
+  },
+  "refresh": {
+    "url": "http://localhost:8080/auth/refresh",
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "refresh_token": "YOUR_REFRESH_TOKEN_HERE"
+    }
+  },
+  "validate": {
+    "url": "http://localhost:8080/auth/validate",
+    "method": "POST",
+    "headers": {
+      "Authorization": "Bearer YOUR_ACCESS_TOKEN_HERE"
+    }
+  }
+}

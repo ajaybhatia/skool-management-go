@@ -1,0 +1,155 @@
+services:
+  # MongoDB for Auth Service
+  mongodb:
+    image: mongo:7
+    container_name: school_mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: password
+      MONGO_INITDB_DATABASE: authdb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    networks:
+      - school_network
+
+  # PostgreSQL for School Service
+  postgres_school:
+    image: postgres:15
+    container_name: school_postgres_school
+    environment:
+      POSTGRES_DB: schooldb
+      POSTGRES_USER: schooluser
+      POSTGRES_PASSWORD: schoolpass
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_school_data:/var/lib/postgresql/data
+      - ./school-service/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U schooluser -d schooldb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - school_network
+
+  # PostgreSQL for Student Service
+  postgres_student:
+    image: postgres:15
+    container_name: school_postgres_student
+    environment:
+      POSTGRES_DB: studentdb
+      POSTGRES_USER: studentuser
+      POSTGRES_PASSWORD: studentpass
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_student_data:/var/lib/postgresql/data
+      - ./student-service/migrations:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studentuser -d studentdb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - school_network
+
+  # Auth Service
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    container_name: school_auth_service
+    environment:
+      MONGODB_URI: mongodb://admin:password@mongodb:27017/authdb?authSource=admin
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      JWT_REFRESH_SECRET: your-super-secret-refresh-key-change-in-production
+      PORT: 8081
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mongodb
+    networks:
+      - school_network
+
+  # School Service
+  school-service:
+    build:
+      context: .
+      dockerfile: school-service/Dockerfile
+    container_name: school_school_service
+    environment:
+      DB_HOST: postgres_school
+      DB_PORT: 5432
+      DB_USER: schooluser
+      DB_PASSWORD: schoolpass
+      DB_NAME: schooldb
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      GRPC_PORT: 50051
+      HTTP_PORT: 8082
+    ports:
+      - "8082:8082"
+      - "50051:50051"
+    depends_on:
+      postgres_school:
+        condition: service_healthy
+    networks:
+      - school_network
+
+  # Student Service
+  student-service:
+    build:
+      context: .
+      dockerfile: student-service/Dockerfile
+    container_name: school_student_service
+    environment:
+      DB_HOST: postgres_student
+      DB_PORT: 5432
+      DB_USER: studentuser
+      DB_PASSWORD: studentpass
+      DB_NAME: studentdb
+      JWT_SECRET: your-super-secret-jwt-key-change-in-production
+      SCHOOL_SERVICE_GRPC: school-service:50051
+      GRPC_PORT: 50052
+      HTTP_PORT: 8083
+    ports:
+      - "8083:8083"
+      - "50052:50052"
+    depends_on:
+      postgres_student:
+        condition: service_healthy
+      school-service:
+        condition: service_started
+    networks:
+      - school_network
+
+  # API Gateway
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: school_api_gateway
+    environment:
+      AUTH_SERVICE_URL: http://auth-service:8081
+      SCHOOL_SERVICE_URL: http://school-service:8082
+      STUDENT_SERVICE_URL: http://student-service:8083
+      PORT: 8080
+    ports:
+      - "8080:8080"
+    depends_on:
+      - auth-service
+      - school-service
+      - student-service
+    networks:
+      - school_network
+
+volumes:
+  mongodb_data:
+  postgres_school_data:
+  postgres_student_data:
+
+networks:
+  school_network:
+    driver: bridge

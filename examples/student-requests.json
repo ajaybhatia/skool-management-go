@@ -1,0 +1,70 @@
+{
+  "create_student": {
+    "url": "http://localhost:8080/students",
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_ACCESS_TOKEN_HERE"
+    },
+    "body": {
+      "roll_number": "001",
+      "first_name": "Alice",
+      "last_name": "Johnson",
+      "email": "alice.johnson@student.com",
+      "phone": "+1-555-0456",
+      "date_of_birth": "2006-08-15",
+      "address": "456 Student Street, Learning City, LC 12345",
+      "school_id": 1,
+      "enrollment_date": "2024-09-01",
+      "status": "active"
+    }
+  },
+  "get_students": {
+    "url": "http://localhost:8080/students",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer YOUR_ACCESS_TOKEN_HERE"
+    }
+  },
+  "get_student": {
+    "url": "http://localhost:8080/students/1",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer YOUR_ACCESS_TOKEN_HERE"
+    }
+  },
+  "get_students_by_school": {
+    "url": "http://localhost:8080/students/school/1",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer YOUR_ACCESS_TOKEN_HERE"
+    }
+  },
+  "update_student": {
+    "url": "http://localhost:8080/students/1",
+    "method": "PUT",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_ACCESS_TOKEN_HERE"
+    },
+    "body": {
+      "roll_number": "001",
+      "first_name": "Alice",
+      "last_name": "Johnson-Smith",
+      "email": "alice.johnson-smith@student.com",
+      "phone": "+1-555-0457",
+      "date_of_birth": "2006-08-15",
+      "address": "789 New Address Ave, Learning City, LC 12345",
+      "school_id": 1,
+      "enrollment_date": "2024-09-01",
+      "status": "active"
+    }
+  },
+  "delete_student": {
+    "url": "http://localhost:8080/students/1",
+    "method": "DELETE",
+    "headers": {
+      "Authorization": "Bearer YOUR_ACCESS_TOKEN_HERE"
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "create_school": {
+    "url": "http://localhost:8080/schools",
+    "method": "POST",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_ACCESS_TOKEN_HERE"
+    },
+    "body": {
+      "registration_number": "REG-RHS-001",
+      "name": "Riverside High School",
+      "address": "123 Education Boulevard, Learning City, LC 12345",
+      "phone": "+1-555-0123",
+      "email": "contact@riverside-high.edu"
+    }
+  },
+  "get_schools": {
+    "url": "http://localhost:8080/schools",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer YOUR_ACCESS_TOKEN_HERE"
+    }
+  },
+  "get_school": {
+    "url": "http://localhost:8080/schools/1",
+    "method": "GET",
+    "headers": {
+      "Authorization": "Bearer YOUR_ACCESS_TOKEN_HERE"
+    }
+  },
+  "update_school": {
+    "url": "http://localhost:8080/schools/1",
+    "method": "PUT",
+    "headers": {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer YOUR_ACCESS_TOKEN_HERE"
+    },
+    "body": {
+      "registration_number": "REG-RHS-001",
+      "name": "Riverside High School - Updated",
+      "address": "123 Education Boulevard, Learning City, LC 12345",
+      "phone": "+1-555-0124",
+      "email": "info@riverside-high.edu"
+    }
+  },
+  "delete_school": {
+    "url": "http://localhost:8080/schools/1",
+    "method": "DELETE",
+    "headers": {
+      "Authorization": "Bearer YOUR_ACCESS_TOKEN_HERE"
+    }
+  }
+}

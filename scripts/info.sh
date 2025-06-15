@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Display service information
+echo "📚 School Management Microservices"
+echo "=================================="
+echo ""
+echo "🌐 API Gateway:     http://localhost:8080"
+echo "📖 API Docs:       http://localhost:8080/docs"
+echo "❤️  Health Check:   http://localhost:8080/health"
+echo ""
+echo "🔐 Auth Service:    http://localhost:8081"
+echo "🏫 School Service:  http://localhost:8082"
+echo "👥 Student Service: http://localhost:8083"
+echo ""
+echo "💾 Databases:"
+echo "  📄 MongoDB (Auth):     localhost:27017"
+echo "  🐘 PostgreSQL (School): localhost:5432"
+echo "  🐘 PostgreSQL (Student): localhost:5433"
+echo ""
+echo "🔧 Management Commands:"
+echo "  📋 View logs:      docker compose logs -f [service-name]"
+echo "  🔄 Restart:       docker compose restart [service-name]"
+echo "  🛑 Stop all:      docker compose down"
+echo "  🧹 Clean up:      docker compose down -v"
+echo ""
+echo "📊 Service Status:"
+docker compose ps

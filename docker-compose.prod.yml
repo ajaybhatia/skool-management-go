@@ -1,0 +1,57 @@
+# Production overrides for docker-compose.yml
+version: '3.8'
+
+services:
+  # Production database configurations
+  mongodb:
+    restart: unless-stopped
+    volumes:
+      - /data/mongodb:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASS}
+
+  postgres_school:
+    restart: unless-stopped
+    volumes:
+      - /data/postgres_school:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${SCHOOL_DB_USER}
+      - POSTGRES_PASSWORD=${SCHOOL_DB_PASS}
+
+  postgres_student:
+    restart: unless-stopped
+    volumes:
+      - /data/postgres_student:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${STUDENT_DB_USER}
+      - POSTGRES_PASSWORD=${STUDENT_DB_PASS}
+
+  # Production service configurations
+  auth-service:
+    restart: unless-stopped
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+
+  school-service:
+    restart: unless-stopped
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_HOST=postgres_school
+      - DB_USER=${SCHOOL_DB_USER}
+      - DB_PASSWORD=${SCHOOL_DB_PASS}
+
+  student-service:
+    restart: unless-stopped
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_HOST=postgres_student
+      - DB_USER=${STUDENT_DB_USER}
+      - DB_PASSWORD=${STUDENT_DB_PASS}
+
+  api-gateway:
+    restart: unless-stopped
+    ports:
+      - "80:8080"  # Expose on port 80 for production
