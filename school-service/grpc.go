@@ -6,45 +6,69 @@ package main
 import (
 	"context"
 	"google.golang.org/grpc"
+	schoolGrpc "skool-management/school-service/internal/grpc"
 )
-
-// Protobuf message types
-type ProtoSchool struct {
-	Id                string
-	RegistrationNumber string
-	Name              string
-	Address           string
-	Phone             string
-	Email             string
-	CreatedAt         string
-	UpdatedAt         string
-}
-
-type GetSchoolRequest struct {
-	Id string
-}
-
-type GetSchoolResponse struct {
-	School *ProtoSchool
-	Found  bool
-}
-
-type ValidateSchoolRequest struct {
-	Id string
-}
-
-type ValidateSchoolResponse struct {
-	Exists bool
-	Name   string
-}
 
 // gRPC service interface
 type SchoolServiceServer interface {
-	GetSchool(context.Context, *GetSchoolRequest) (*GetSchoolResponse, error)
-	ValidateSchool(context.Context, *ValidateSchoolRequest) (*ValidateSchoolResponse, error)
+	GetSchool(context.Context, *schoolGrpc.GetSchoolRequest) (*schoolGrpc.GetSchoolResponse, error)
+	ValidateSchool(context.Context, *schoolGrpc.ValidateSchoolRequest) (*schoolGrpc.ValidateSchoolResponse, error)
 }
 
-// Register function (simplified)
+// Register function
 func RegisterSchoolServiceServer(s *grpc.Server, srv SchoolServiceServer) {
-	// In a real implementation, this would register the service with gRPC
+	s.RegisterService(&SchoolService_ServiceDesc, srv)
+}
+
+var SchoolService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "SchoolService",
+	HandlerType: (*SchoolServiceServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetSchool",
+			Handler:    _SchoolService_GetSchool_Handler,
+		},
+		{
+			MethodName: "ValidateSchool",
+			Handler:    _SchoolService_ValidateSchool_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "school.proto",
+}
+
+func _SchoolService_GetSchool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(schoolGrpc.GetSchoolRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SchoolServiceServer).GetSchool(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/SchoolService/GetSchool",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SchoolServiceServer).GetSchool(ctx, req.(*schoolGrpc.GetSchoolRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SchoolService_ValidateSchool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(schoolGrpc.ValidateSchoolRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SchoolServiceServer).ValidateSchool(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/SchoolService/ValidateSchool",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SchoolServiceServer).ValidateSchool(ctx, req.(*schoolGrpc.ValidateSchoolRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
