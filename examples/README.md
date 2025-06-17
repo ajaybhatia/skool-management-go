@@ -204,3 +204,80 @@ After cleaning, you can recreate test data:
 ```
 
 Or create data manually using the API endpoints above.
+
+## Circuit Breaker Testing
+
+### Monitor Circuit Breaker Status
+
+```bash
+# Check overall system health with circuit breaker states
+curl http://localhost:8080/health | jq .
+
+# Monitor specific circuit breaker
+curl http://localhost:8080/health | jq '.data.auth.circuit_breaker'
+```
+
+### Test Circuit Breaker Behavior
+
+#### 1. Test Service Failure (API Gateway → Auth Service)
+
+```bash
+# Stop auth service to simulate failure
+docker compose stop auth-service
+
+# Make multiple requests to trigger circuit breaker
+for i in {1..6}; do
+  echo "Request $i:"
+  curl -X POST http://localhost:8080/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email": "test@example.com", "password": "test123"}' \
+    -w "\nStatus: %{http_code}\n" -s | head -2
+  echo "---"
+done
+
+# Check circuit breaker status
+curl -s http://localhost:8080/health | jq '.data.auth.circuit_breaker'
+```
+
+**Expected behavior:**
+
+- First 5 requests: `502` status (SERVICE_UNAVAILABLE)
+- 6th request: `503` status (CIRCUIT_BREAKER_OPEN)
+
+#### 2. Test Circuit Breaker Recovery
+
+```bash
+# Restart the service
+docker compose start auth-service
+
+# Wait for reset timeout (60 seconds) or test immediately
+curl -X POST http://localhost:8080/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "test@example.com", "password": "test123"}' | jq .
+
+# Verify circuit breaker is closed
+curl -s http://localhost:8080/health | jq '.data.auth.circuit_breaker'
+```
+
+#### 3. Test Database Circuit Breaker
+
+```bash
+# Stop database to test internal circuit breaker
+docker compose stop mongodb
+
+# Make auth requests (will trigger database circuit breaker)
+for i in {1..6}; do
+  curl -X POST http://localhost:8080/auth/login \
+    -H "Content-Type: application/json" \
+    -d '{"email": "test@example.com", "password": "test123"}' -w "\nStatus: %{http_code}\n"
+done
+
+# Check auth service logs for circuit breaker messages
+docker compose logs auth-service --tail=10
+```
+
+### Circuit Breaker States
+
+- **CLOSED** (0): Normal operation, all requests pass through
+- **HALF_OPEN** (1): Testing recovery, limited requests allowed
+- **OPEN** (2): Failure detected, requests rejected immediately

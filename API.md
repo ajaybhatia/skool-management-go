@@ -506,6 +506,81 @@ The API Gateway implements rate limiting:
 - 100 requests per minute per IP address
 - 1000 requests per hour per authenticated user
 
+## Circuit Breaker Protection
+
+The system implements circuit breaker patterns for enhanced resilience:
+
+### Circuit Breaker Endpoints
+
+#### GET /health
+
+Returns system health status including circuit breaker states:
+
+**Response:**
+
+```json
+{
+  "message": "All services are healthy",
+  "data": {
+    "auth": {
+      "circuit_breaker": {
+        "failure_count": 0,
+        "state": "CLOSED"
+      },
+      "status": "healthy"
+    },
+    "gateway": {
+      "status": "healthy"
+    },
+    "school": {
+      "circuit_breaker": {
+        "failure_count": 0,
+        "state": "CLOSED"
+      },
+      "status": "healthy"
+    },
+    "student": {
+      "circuit_breaker": {
+        "failure_count": 0,
+        "state": "CLOSED"
+      },
+      "status": "healthy"
+    }
+  }
+}
+```
+
+### Circuit Breaker Behavior
+
+| State         | Behavior         | Response                            |
+| ------------- | ---------------- | ----------------------------------- |
+| **CLOSED**    | Normal operation | Requests pass through               |
+| **HALF_OPEN** | Testing recovery | Limited requests allowed            |
+| **OPEN**      | Service failure  | Immediate rejection with 503 status |
+
+### Circuit Breaker Responses
+
+When a circuit breaker is open:
+
+**Status Code:** `503 Service Unavailable`
+
+**Response:**
+
+```json
+{
+  "error": "CIRCUIT_BREAKER_OPEN",
+  "message": "Service is temporarily unavailable due to circuit breaker"
+}
+```
+
+### Configuration
+
+| Service             | Max Failures | Reset Timeout |
+| ------------------- | ------------ | ------------- |
+| HTTP Services       | 5            | 60 seconds    |
+| gRPC Services       | 3            | 30 seconds    |
+| Database Operations | 5            | 60 seconds    |
+
 ## Inter-Service Communication
 
 Services communicate using gRPC for internal operations:

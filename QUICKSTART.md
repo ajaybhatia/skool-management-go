@@ -86,6 +86,37 @@ make build         # Build services without starting
 make info          # Show service information
 ```
 
+## 🔍 Monitoring & Health Checks
+
+### Check System Health
+
+```bash
+# Check all services and circuit breakers
+curl http://localhost:8080/health | jq .
+
+# Quick health check via make command
+make health
+```
+
+### Monitor Circuit Breakers
+
+```bash
+# View circuit breaker states
+curl http://localhost:8080/health | jq '.data.*.circuit_breaker'
+
+# Example response:
+# {
+#   "failure_count": 0,
+#   "state": "CLOSED"
+# }
+```
+
+### Circuit Breaker States
+
+- **CLOSED**: Normal operation ✅
+- **HALF_OPEN**: Testing recovery 🟡
+- **OPEN**: Service protection active 🔴
+
 ## 🗑️ Database Management
 
 ### Clean Test Data

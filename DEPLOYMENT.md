@@ -304,6 +304,27 @@ kubectl get ingress
 
 ## Monitoring & Logging
 
+### Health Check Endpoint
+
+Monitor service health and circuit breaker states:
+
+```bash
+# Check overall system health
+curl http://localhost:8080/health
+
+# Monitor specific circuit breaker
+curl http://localhost:8080/health | jq '.data.auth.circuit_breaker'
+```
+
+### Circuit Breaker Monitoring
+
+Important metrics to monitor:
+
+- **Circuit breaker state** (CLOSED/HALF_OPEN/OPEN)
+- **Failure count** per circuit breaker
+- **State transition frequency**
+- **Recovery time** from OPEN to CLOSED
+
 ### Prometheus Metrics
 
 Add Prometheus metrics to each service:
@@ -315,6 +336,27 @@ import "github.com/prometheus/client_golang/prometheus/promhttp"
 http.Handle("/metrics", promhttp.Handler())
 ```
 
+Recommended circuit breaker metrics:
+
+````go
+var (
+    circuitBreakerState = prometheus.NewGaugeVec(
+        prometheus.GaugeOpts{
+            Name: "circuit_breaker_state",
+            Help: "Circuit breaker state (0=CLOSED, 1=HALF_OPEN, 2=OPEN)",
+        },
+        []string{"service", "breaker_name"},
+    )
+
+    circuitBreakerFailures = prometheus.NewCounterVec(
+        prometheus.CounterOpts{
+            Name: "circuit_breaker_failures_total",
+            Help: "Total circuit breaker failures",
+        },
+        []string{"service", "breaker_name"},
+    )
+)
+
 ### Grafana Dashboard
 
 Create dashboards for:
@@ -323,6 +365,8 @@ Create dashboards for:
 - Database connections
 - Memory and CPU usage
 - Error rates
+- **Circuit breaker states and failure counts**
+- **Service availability and recovery times**
 
 ### Centralized Logging
 
@@ -339,7 +383,7 @@ filebeat.inputs:
 
 output.elasticsearch:
   hosts: ["elasticsearch:9200"]
-```
+````
 
 ## Security Considerations
 
@@ -469,4 +513,71 @@ spec:
         target:
           type: Utilization
           averageUtilization: 70
+```
+
+## Circuit Breaker Configuration
+
+### Environment Variables
+
+Configure circuit breaker behavior via environment variables:
+
+```yaml
+# docker-compose.prod.yml
+environment:
+  # Circuit breaker settings for API Gateway
+  - CB_HTTP_MAX_FAILURES=5
+  - CB_HTTP_RESET_TIMEOUT=60s
+
+  # Circuit breaker settings for gRPC services
+  - CB_GRPC_MAX_FAILURES=3
+  - CB_GRPC_RESET_TIMEOUT=30s
+
+  # Database circuit breaker settings
+  - CB_DB_MAX_FAILURES=5
+  - CB_DB_RESET_TIMEOUT=60s
+```
+
+### Production Tuning
+
+Recommended settings for production:
+
+| Environment     | Max Failures | Reset Timeout | Use Case          |
+| --------------- | ------------ | ------------- | ----------------- |
+| **Development** | 3            | 30s           | Fast feedback     |
+| **Staging**     | 5            | 60s           | Realistic testing |
+| **Production**  | 10           | 120s          | Stability focus   |
+
+### Circuit Breaker Patterns
+
+**Fail Fast Pattern:**
+
+- Lower max failures (3-5)
+- Shorter reset timeout (30-60s)
+- Good for user-facing services
+
+**Resilience Pattern:**
+
+- Higher max failures (5-10)
+- Longer reset timeout (60-120s)
+- Good for background services
+
+**Database Pattern:**
+
+- Medium max failures (5-7)
+- Medium reset timeout (60-90s)
+- Protects against connection pool exhaustion
+
+### Monitoring Alerts
+
+Set up alerts for:
+
+```bash
+# Circuit breaker opened
+circuit_breaker_state == 2
+
+# High failure rate
+rate(circuit_breaker_failures_total[5m]) > 0.1
+
+# Extended downtime
+circuit_breaker_state == 2 and time() - circuit_breaker_last_state_change > 300
 ```
