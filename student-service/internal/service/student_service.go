@@ -15,14 +15,21 @@ import (
 )
 
 type StudentService struct {
-	studentRepo       *repository.StudentRepository
-	schoolServiceConn *grpcLib.ClientConn
+	studentRepo          *repository.StudentRepository
+	schoolServiceConn    *grpcLib.ClientConn
+	schoolCircuitBreaker *shared.CircuitBreaker
 }
 
 func NewStudentService(studentRepo *repository.StudentRepository, schoolServiceConn *grpcLib.ClientConn) *StudentService {
 	return &StudentService{
 		studentRepo:       studentRepo,
 		schoolServiceConn: schoolServiceConn,
+		// Initialize circuit breaker for school service gRPC calls
+		schoolCircuitBreaker: shared.NewCircuitBreaker(shared.CircuitBreakerConfig{
+			Name:         "school-service-grpc",
+			MaxFailures:  3,
+			ResetTimeout: 30 * time.Second,
+		}),
 	}
 }
 
@@ -32,20 +39,40 @@ func (s *StudentService) validateSchool(schoolID int) (bool, string, error) {
 		return true, "", nil // Skip validation if gRPC connection is not available
 	}
 
-	// Temporarily disable gRPC validation due to protobuf marshaling issues
-	// In a production environment, this would use proper protobuf generated code
-	shared.LogInfo("STUDENT_SERVICE", fmt.Sprintf("Temporarily skipping gRPC validation for school ID %d", schoolID))
-	return true, "Test School", nil
+	var exists bool
+	var name string
 
-	// TODO: Re-enable once proper protobuf code is generated
-	// client := grpc.NewSchoolServiceClient(s.schoolServiceConn)
-	// resp, err := client.ValidateSchool(context.Background(), &grpc.ValidateSchoolRequest{
-	// 	Id: strconv.Itoa(schoolID),
-	// })
-	// if err != nil {
-	// 	return false, "", err
-	// }
-	// return resp.Exists, resp.Name, nil
+	// Use circuit breaker for gRPC calls
+	err := s.schoolCircuitBreaker.Execute(func() error {
+		// Temporarily disable gRPC validation due to protobuf marshaling issues
+		// In a production environment, this would use proper protobuf generated code
+		shared.LogInfo("STUDENT_SERVICE", fmt.Sprintf("Temporarily skipping gRPC validation for school ID %d", schoolID))
+		exists = true
+		name = "Test School"
+		return nil
+
+		// TODO: Re-enable once proper protobuf code is generated
+		// client := grpc.NewSchoolServiceClient(s.schoolServiceConn)
+		// resp, err := client.ValidateSchool(context.Background(), &grpc.ValidateSchoolRequest{
+		// 	Id: strconv.Itoa(schoolID),
+		// })
+		// if err != nil {
+		// 	return err
+		// }
+		// exists = resp.Exists
+		// name = resp.Name
+		// return nil
+	})
+
+	if err != nil {
+		if err.Error() == "circuit breaker is OPEN" {
+			shared.LogError("STUDENT_SERVICE", "school validation circuit breaker", err)
+			return false, "", errors.New("school service temporarily unavailable")
+		}
+		return false, "", err
+	}
+
+	return exists, name, nil
 }
 
 func (s *StudentService) CreateStudent(req *models.CreateStudentRequest) (*models.Student, error) {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"time"
 
 	"skool-management/auth-service/internal/models"
 	"skool-management/auth-service/internal/repository"
@@ -13,14 +14,21 @@ import (
 )
 
 type AuthService struct {
-	userRepo   *repository.UserRepository
-	jwtManager *shared.JWTManager
+	userRepo         *repository.UserRepository
+	jwtManager       *shared.JWTManager
+	dbCircuitBreaker *shared.CircuitBreaker
 }
 
 func NewAuthService(userRepo *repository.UserRepository, jwtManager *shared.JWTManager) *AuthService {
 	return &AuthService{
 		userRepo:   userRepo,
 		jwtManager: jwtManager,
+		// Initialize circuit breaker for database operations
+		dbCircuitBreaker: shared.NewCircuitBreaker(shared.CircuitBreakerConfig{
+			Name:         "auth-database",
+			MaxFailures:  5,
+			ResetTimeout: 60 * time.Second,
+		}),
 	}
 }
 
@@ -65,8 +73,23 @@ func (s *AuthService) Signup(req *models.SignupRequest) (*models.User, error) {
 }
 
 func (s *AuthService) Login(req *models.LoginRequest) (*models.LoginResponse, error) {
-	// Find user by email
-	user, err := s.userRepo.GetByEmail(req.Email)
+	var user *models.User
+	var err error
+
+	// Use circuit breaker for database operations
+	dbErr := s.dbCircuitBreaker.Execute(func() error {
+		// Find user by email
+		user, err = s.userRepo.GetByEmail(req.Email)
+		return err
+	})
+
+	if dbErr != nil {
+		if dbErr.Error() == "circuit breaker is OPEN" {
+			return nil, errors.New("authentication service temporarily unavailable")
+		}
+		return nil, dbErr
+	}
+
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, errors.New("invalid email or password")

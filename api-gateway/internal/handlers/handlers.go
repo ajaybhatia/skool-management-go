@@ -57,18 +57,41 @@ func (h *Handlers) HandleHealth(w http.ResponseWriter, r *http.Request) {
 	client := &http.Client{Timeout: 5 * time.Second}
 
 	for service, url := range services {
+		var serviceHealth map[string]interface{}
+
 		resp, err := client.Get(url)
 		if err != nil || resp.StatusCode != http.StatusOK {
-			healthStatus[service] = map[string]interface{}{
+			serviceHealth = map[string]interface{}{
 				"status": "unhealthy",
 				"error":  err.Error(),
 			}
 			allHealthy = false
 		} else {
-			healthStatus[service] = map[string]interface{}{
+			serviceHealth = map[string]interface{}{
 				"status": "healthy",
 			}
 		}
+
+		// Add circuit breaker status
+		var circuitBreaker *shared.CircuitBreaker
+		switch service {
+		case "auth":
+			circuitBreaker = h.gateway.GetAuthCircuitBreaker()
+		case "school":
+			circuitBreaker = h.gateway.GetSchoolCircuitBreaker()
+		case "student":
+			circuitBreaker = h.gateway.GetStudentCircuitBreaker()
+		}
+
+		if circuitBreaker != nil {
+			serviceHealth["circuit_breaker"] = map[string]interface{}{
+				"state":         circuitBreaker.GetState().String(),
+				"failure_count": circuitBreaker.GetFailureCount(),
+			}
+		}
+
+		healthStatus[service] = serviceHealth
+
 		if resp != nil {
 			resp.Body.Close()
 		}
